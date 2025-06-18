@@ -1,0 +1,13 @@
+<h2>All Products</h2>
+<ul>
+  {% for product in products %}
+    <li>
+      <strong>{{ product.name }}</strong> — {{ product.price }}৳<br>
+      {{ product.description }}<br>
+      {% if product.image %}
+        <img src="{{ product.image.url }}" width="100">
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+<a href="{% url 'add_product' %}">Add New Product</a>

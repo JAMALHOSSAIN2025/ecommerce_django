@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Your Profile</title>
+    <style>
+        /* তোমার পছন্দ মতো CSS দিতে পারো */
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        .form-container {
+            max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%; padding: 10px; margin: 8px 0; border-radius: 4px; border: 1px solid #ccc;
+        }
+        button {
+            background-color: #28a745; color: white; border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Complete Your Profile</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</body>
+</html>
