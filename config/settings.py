@@ -10,7 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security
 SECRET_KEY = 'your-secret-key'
 DEBUG = True
-ALLOWED_HOSTS = ['ecommerce-backend-l4j1.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'ecommerce-django-5g7x.onrender.com',
+]
 
 # Installed apps
 INSTALLED_APPS = [
