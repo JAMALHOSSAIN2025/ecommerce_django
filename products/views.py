@@ -22,3 +22,5 @@ def add_product(request):
 def product_list(request):
     products = Product.objects.all().order_by('-created_at')  # নতুন প্রোডাক্ট আগে
     return render(request, 'products/product_list.html', {'products': products})
+
+# This is a dummy comment to test Render trigger
