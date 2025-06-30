@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from accounts.views import RegisterView  # ✅ এই লাইনটি যোগ করুন
+from django.shortcuts import redirect 
 
 urlpatterns = [
     # Admin Panel
@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/orders-alt/', include('order_app.urls')),
 
     # Default fallback or root redirect
-    path('', RedirectView.as_view(url='/home/', permanent=False)),
+    path('', lambda request: redirect('/accounts/home/')),
 ]
 
 # Media files (for development only)
