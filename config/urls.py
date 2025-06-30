@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from accounts.api_views import RegisterView
+from accounts.views import RegisterView
 
 urlpatterns = [
     # Admin Panel
