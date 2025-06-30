@@ -1,22 +1,53 @@
+# accounts/views.py
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 
+from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from .serializers import UserSerializer, MyTokenObtainPairSerializer
-from .forms import CompleteProfileForm, ProfileForm  # Ensure you created ProfileForm
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from .serializers import (
+    UserSerializer,
+    MyTokenObtainPairSerializer,
+    RegisterSerializer,
+)
+from .forms import CompleteProfileForm, ProfileForm  # Ensure you created ProfileForm
 
 User = get_user_model()
 
-
 # ------------------ JWT View ------------------
+
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+
+# ------------------ API Views ------------------
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_list_api(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user_info(request):
+    user = request.user
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
 
 
 # ------------------ UI Views ------------------
@@ -79,21 +110,3 @@ def complete_profile_view(request):
         form = CompleteProfileForm(instance=user.profile)
 
     return render(request, 'accounts/complete_profile.html', {'form': form})
-
-
-# ------------------ API Views ------------------
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def user_list_api(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def current_user_info(request):
-    user = request.user
-    serializer = UserSerializer(user)
-    return Response(serializer.data)
