@@ -1,5 +1,3 @@
-# accounts/serializers.py
-
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model, authenticate
@@ -14,17 +12,18 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'username']  # You can add other fields if needed
+        fields = ['id', 'email', 'username']  # প্রয়োজন অনুযায়ী ফিল্ড বাড়াতে পারো
 
 
 # ------------------ JWT Login Serializer ------------------
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = 'email'  # Use email as username for login
+    username_field = 'email'  # Login এর জন্য email ইউজ করবো
 
     def validate(self, attrs):
+        # DRF authenticate expects 'username', তাই email দিয়ে username হিসেবে পাঠানো হচ্ছে
         credentials = {
-            'username': attrs.get('email'),  # Because default backend uses `username`
+            'username': attrs.get('email'),
             'password': attrs.get('password')
         }
 
@@ -34,7 +33,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         data = super().validate(attrs)
 
-        # Include user info in the response
+        # ইউজারের তথ্য রেসপন্সে যোগ করা হলো
         data['user'] = {
             'id': user.id,
             'email': user.email,
@@ -56,7 +55,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data['password'] != data['password2']:
-            raise serializers.ValidationError("Passwords do not match")
+            raise serializers.ValidationError({"password": "Passwords do not match"})
 
         try:
             validate_password(data['password'])
@@ -66,10 +65,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('password2')  # Remove confirm password
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
+        validated_data.pop('password2')
+        username = validated_data.get('username', None)
+        email = validated_data['email']
+        password = validated_data['password']
+
+        # username optional হলে এখানে লজিক দিতে পারো
+        if username:
+            user = User.objects.create_user(username=username, email=email, password=password)
+        else:
+            # username না থাকলে email দিয়েই ইউজার তৈরি করতে পারো (Depends on your User model)
+            user = User.objects.create_user(email=email, password=password)
+
         return user

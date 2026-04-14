@@ -1,9 +1,27 @@
+// cart/urls.py
+
 from django.urls import path
-from . import views
+from .views import (
+    CartView,
+    AddToCartView,
+    RemoveFromCartView,
+    UpdateCartItemView,
+    ClearCartView
+)
 
 urlpatterns = [
-    path('', views.CartView.as_view(), name='cart-detail'),  # GET, POST cart details
-    path('add/', views.AddToCartView.as_view(), name='cart-add-item'),  # POST add item
-    path('remove/<int:item_id>/', views.RemoveFromCartView.as_view(), name='cart-remove-item'),  # DELETE item
-    path('update/<int:item_id>/', views.UpdateCartItemView.as_view(), name='cart-update-item'),  # PATCH update qty
+    # 🛒 Get cart
+    path('', CartView.as_view(), name='cart-detail'),
+
+    # ➕ Add item
+    path('add/', AddToCartView.as_view(), name='cart-add-item'),
+
+    # ✏️ Update quantity
+    path('update/<int:item_id>/', UpdateCartItemView.as_view(), name='cart-update-item'),
+
+    # ❌ Remove item
+    path('remove/<int:item_id>/', RemoveFromCartView.as_view(), name='cart-remove-item'),
+
+    # 🧹 Clear cart (IMPORTANT for checkout)
+    path('clear/', ClearCartView.as_view(), name='cart-clear'),
 ]

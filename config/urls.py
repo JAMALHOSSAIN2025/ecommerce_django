@@ -1,36 +1,21 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from dj_rest_auth.registration.views import RegisterView
-from django.shortcuts import redirect 
 
 urlpatterns = [
-    # Admin Panel
     path('admin/', admin.site.urls),
 
-    # Authentication (Traditional and Social)
-    path('accounts/', include('accounts.urls')),
-    path('oauth/', include('social_django.urls', namespace='social')),
-    path('api/register/', RegisterView.as_view(), name='register'),
+    # UI Views (HTML pages)
+    path('accounts/', include('accounts.urls', namespace='accounts')),
 
-    # JWT Token Auth
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # API Views (JWT, Register, Complete Profile, etc.)
+    path('api/accounts/', include('accounts.api_urls')),  # REST API endpoints
 
-    # API Endpoints
-    path('api/accounts/', include('accounts.urls')),
-    path('api/products/', include('products.api_urls')),
-    path('api/cart/', include('cart.urls')),
-    path('api/orders/', include('orders.urls')),
-    path('api/orders-alt/', include('order_app.urls')),
-
-    # Default fallback or root redirect
-    path('', lambda request: redirect('/accounts/home/')),
+    # Social Login (Google, etc.)
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ]
 
-# Media files (for development only)
+# Serve media files during development (only when DEBUG=True)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,3 +1,5 @@
+<!-- accounts/templates/accounts/register.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,34 +11,36 @@
 <body>
 {% load crispy_forms_tags %}
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Register</h2>
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="text-center mb-4">Create Your Account</h2>
+
+    <!-- Display Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
 
     <!-- Display Form Errors -->
-    {% if user_form.errors %}
+    {% if user_form.errors or profile_form.errors %}
         <div class="alert alert-danger">
-            <strong>User Form Errors:</strong>
-            {{ user_form.errors }}
-        </div>
-    {% endif %}
-    {% if profile_form.errors %}
-        <div class="alert alert-danger">
-            <strong>Profile Form Errors:</strong>
-            {{ profile_form.errors }}
+            <strong>Please fix the errors below.</strong>
         </div>
     {% endif %}
 
     <!-- Registration Form -->
-    <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
+    <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm border">
         {% csrf_token %}
 
         <fieldset class="mb-4">
-            <legend>Account Info</legend>
+            <legend class="fs-5">Account Info</legend>
             {{ user_form|crispy }}
         </fieldset>
 
         <fieldset class="mb-4">
-            <legend>Profile Info</legend>
+            <legend class="fs-5">Profile Info</legend>
             {{ profile_form|crispy }}
         </fieldset>
 

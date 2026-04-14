@@ -1,24 +1,24 @@
-# config/settings.py
+# ecommerce_django/config/settings.py
 
 from pathlib import Path
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
-# Base directory
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security
-SECRET_KEY = 'your-secret-key'
-DEBUG = True
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-default-secret-key')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'ecommerce-django-5g7x.onrender.com',
 ]
 
-# Installed apps
 INSTALLED_APPS = [
-    # Django built-ins
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -27,51 +27,45 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    # Third-party apps
     'rest_framework',
-    'rest_framework.authtoken',  # ✅ দরকার dj_rest_auth এর জন্য
+    'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'social_django',
+    'corsheaders',
     'crispy_forms',
     'crispy_bootstrap5',
+    'social_django',
 
-    # Your custom apps
-    'accounts',
+    'accounts.apps.AccountsConfig',
     'products',
-    'crockery',  # যদি অ্যাপটি থাকে
+    'crockery',
     'cart',
     'orders',
 ]
 
 SITE_ID = 1
 
-# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # ✅ একবারই যথেষ্ট
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    # Custom middleware
+
     'allauth.account.middleware.AccountMiddleware',
-    'accounts.signals.GoogleLoginRedirectMiddleware',
+    'accounts.middleware.GoogleLoginRedirectMiddleware',
 ]
 
-# URL Configuration
 ROOT_URLCONF = 'config.urls'
 
-# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -88,10 +82,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -99,67 +91,59 @@ DATABASES = {
     }
 }
 
-# Custom user model
-# AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Authentication backends
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.google.GoogleOAuth2',
+    'accounts.authentication.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'accounts.authentication.EmailBackend',  # আমাদের কাস্টম backend
-    'django.contrib.auth.backends.ModelBackend',  # ডিফল্ট
+    'social_core.backends.google.GoogleOAuth2',
 ]
 
-# Login / Logout Redirects
-LOGIN_URL = 'login'
-LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'home'
-
-# Google OAuth settings
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '<your-client-id>'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '<your-client-secret>'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
-
-# REST Framework config
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
 
-# JWT Settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Localization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 
-# Static and Media files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static'] 
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # React Vite dev server
-]
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Asia/Dhaka'
+USE_I18N = True
+USE_TZ = True
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# Default primary key field type
+LOGIN_URL = '/accounts/login/'
+LOGOUT_URL = '/accounts/logout/'
+LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('GOOGLE_CLIENT_ID', '<your-client-id>')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '<your-client-secret>')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-AUTH_USER_MODEL = 'accounts.CustomUser'
-

@@ -1,75 +1,67 @@
+<!-- accounts/templates/accounts/login.html -->
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Login</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 40px; }
-        .login-container {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        input[type="email"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            border-radius: 5px;
-        }
-        .google-btn {
-            background-color: #4285F4;
-            color: white;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            border-radius: 5px;
-            margin-top: 10px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
-        a { display: block; text-align: center; margin-top: 15px; color: #007BFF; }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome for Google Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
+{% load crispy_forms_tags %}
 
-        {% if messages %}
-            {% for message in messages %}
-                <p style="color:red;">{{ message }}</p>
-            {% endfor %}
-        {% endif %}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Login</h3>
 
-        <form method="POST">
-            {% csrf_token %}
-            <label for="email">Email:</label>
-            <input type="email" name="email" required>
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-            <label for="password">Password:</label>
-            <input type="password" name="password" required>
+            <!-- Form Start -->
+            <form method="POST" novalidate>
+                {% csrf_token %}
 
-            <button type="submit">Login</button>
-        </form>
+                <!-- Show form non-field errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
 
-        <p>Or</p>
-        <a class="google-btn" href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">
-            Login with Google
-        </a>
+                {{ form|crispy }}
 
-        <a href="{% url 'register' %}">Don't have an account? Register here</a>
+                <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <span>Or</span>
+            </div>
+
+            <!-- Google Login -->
+            <a class="btn btn-danger w-100 mt-2" href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">
+                <i class="fab fa-google"></i> Login with Google
+            </a>
+
+            <p class="text-center mt-3">
+                Don't have an account?
+                <a href="{% url 'register' %}">Register here</a>
+            </p>
+        </div>
     </div>
+</div>
+
+<!-- Bootstrap JS (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
